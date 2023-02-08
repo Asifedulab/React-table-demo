@@ -1,7 +1,9 @@
-import React, { useMemo } from 'react';
-import { useTable } from 'react-table';
+import React, { useMemo,useRef } from 'react';
+import { useGlobalFilter, useTable } from 'react-table';
+
 
 function Table({ data }) {
+  // const [filterInput, setFilterInput] = useState('');
   const columns = useMemo(
     ()=>[
     {
@@ -22,15 +24,33 @@ function Table({ data }) {
     },
   ],[]
   )
+  
+
+  const searchInput = useRef(null);
+
+  const handleSearch = e => {
+    setGlobalFilter(e.target.value || undefined);
+  };
+
   const {
     getTableProps,
     getTableBodyProps,
     headerGroups,
     rows,
+    setGlobalFilter,
     prepareRow,
-  } = useTable({ columns, data })
+  } = useTable({ columns, data, initialState: {
+    pageIndex: 0,
+  } },useGlobalFilter)
 
   return (
+    <div>
+     <input
+        ref={searchInput}
+        on  Change={handleSearch}
+        placeholder={"Search All"}
+        style={{ width: "100%", marginBottom: "1rem" }}
+      />        
     <table {...getTableProps()}>
       <thead>
         {headerGroups.map(headerGroup => (
@@ -50,10 +70,11 @@ function Table({ data }) {
                 return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
               })}
             </tr>
-          )
+          );
         })}
       </tbody>
     </table>
+    </div>
   )
 }
 
